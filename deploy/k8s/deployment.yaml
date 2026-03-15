@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
       - name: contract-service
-        image: ghcr.io/apsferreira/contract-service:main-latest
+        image: ghcr.io/apsferreira/contract-service:main-sha-a7a4939
         ports:
         - containerPort: 3014
           name: http
