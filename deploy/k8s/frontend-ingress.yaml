@@ -1,0 +1,23 @@
+# =============================================================================
+# Contract Service Frontend — Traefik IngressRoute
+# Domain: contracts.institutoitinerante.com.br → contract-service-frontend:80
+# =============================================================================
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: contract-service-frontend
+  namespace: production
+  labels:
+    app: contract-service-frontend
+    component: frontend
+    part-of: instituto-itinerante
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`contracts.institutoitinerante.com.br`)
+      kind: Rule
+      services:
+        - name: contract-service-frontend
+          port: 80

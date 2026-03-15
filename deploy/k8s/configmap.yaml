@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: contract-service-config
+  namespace: production
+  labels:
+    app: contract-service
+    component: backend
+    part-of: instituto-itinerante
+    environment: production
+data:
+  otel-endpoint: "obs-otel-collector:4317"
+  log-level: "info"
+  enable-metrics: "true"
+  enable-tracing: "true"
