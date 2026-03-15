@@ -146,7 +146,6 @@ func (r *templateRepository) Update(ctx context.Context, id uuid.UUID, req *mode
 	if req.IsActive != nil {
 		updates = append(updates, "is_active = $"+string(rune('0'+argPos)))
 		args = append(args, *req.IsActive)
-		argPos++
 		if !*req.IsActive {
 			updates = append(updates, "deactivated_at = CURRENT_TIMESTAMP")
 		}

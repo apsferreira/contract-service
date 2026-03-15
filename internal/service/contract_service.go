@@ -92,7 +92,7 @@ func (s *contractService) AcceptContract(ctx context.Context, contractID uuid.UU
 	}
 
 	if time.Now().After(contract.ExpiresAt) {
-		s.contractRepo.UpdateStatus(ctx, contractID, model.ContractStatusExpired)
+		_ = s.contractRepo.UpdateStatus(ctx, contractID, model.ContractStatusExpired)
 		return nil, fmt.Errorf("contract expired")
 	}
 
