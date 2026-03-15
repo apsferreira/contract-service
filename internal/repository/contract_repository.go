@@ -74,7 +74,9 @@ func (r *contractRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.
 	}
 
 	if len(variablesJSON) > 0 {
-		json.Unmarshal(variablesJSON, &c.Variables)
+		if err := json.Unmarshal(variablesJSON, &c.Variables); err != nil {
+			return nil, err
+		}
 	}
 
 	return &c, nil
@@ -131,7 +133,9 @@ func (r *contractRepository) ListByUser(ctx context.Context, userID uuid.UUID, l
 		}
 
 		if len(variablesJSON) > 0 {
-			json.Unmarshal(variablesJSON, &c.Variables)
+			if err := json.Unmarshal(variablesJSON, &c.Variables); err != nil {
+				return nil, 0, err
+			}
 		}
 
 		contracts = append(contracts, c)

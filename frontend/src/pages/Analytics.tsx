@@ -1,9 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { 
-  BarChart3, 
-  TrendingUp, 
-  FileSignature, 
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/card';
+import { Button } from '@/components/button';
+import {
+  BarChart3,
+  FileSignature,
   Clock,
   Calendar,
   Filter,

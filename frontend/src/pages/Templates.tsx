@@ -1,18 +1,16 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { 
-  Plus, 
-  Search, 
-  FileText, 
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/card';
+import { Button } from '@/components/button';
+import {
+  Plus,
+  Search,
   Edit,
   Trash2,
   Eye,
   Copy,
   CheckCircle,
   AlertTriangle,
-  Code,
-  Download
+  Code
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 

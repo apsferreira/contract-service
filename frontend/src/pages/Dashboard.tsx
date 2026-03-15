@@ -1,12 +1,9 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  FileSignature, 
-  FileText, 
-  TrendingUp, 
-  AlertCircle,
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/card';
+import {
+  FileSignature,
+  FileText,
   CheckCircle,
   Clock,
-  XCircle,
   Shield
 } from 'lucide-react';
 
