@@ -170,8 +170,8 @@ jobs:
     - name: Update image tags in deployment manifests
       run: |
         SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-        sed -i "s|ghcr.io/apsferreira/contract-service:.*|ghcr.io/apsferreira/contract-service:main-sha-${SHORT_SHA}|" deploy/k8s/deployment.yaml
-        sed -i "s|ghcr.io/apsferreira/contract-service-frontend:.*|ghcr.io/apsferreira/contract-service-frontend:main-sha-${SHORT_SHA}|" deploy/k8s/frontend-deployment.yaml
+        sed -i "s|ghcr.io/apsferreira/contract-service:.*|ghcr.io/apsferreira/contract-service:main-${SHORT_SHA}|" deploy/k8s/deployment.yaml
+        sed -i "s|ghcr.io/apsferreira/contract-service-frontend:.*|ghcr.io/apsferreira/contract-service-frontend:main-${SHORT_SHA}|" deploy/k8s/frontend-deployment.yaml
 
     - name: Commit and push updated manifests
       run: |
