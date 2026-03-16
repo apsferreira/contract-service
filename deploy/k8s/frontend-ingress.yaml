@@ -1,6 +1,7 @@
 # =============================================================================
 # Contract Service Frontend — Traefik IngressRoute
 # Domain: contract.institutoitinerante.com.br → contract-service-frontend:80
+# (sem 's' — alinhado com CF Tunnel)
 # =============================================================================
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
@@ -16,7 +17,7 @@ spec:
     - web
     - websecure
   routes:
-    - match: Host(`contracts.institutoitinerante.com.br`)
+    - match: Host(`contract.institutoitinerante.com.br`)
       kind: Rule
       services:
         - name: contract-service-frontend
