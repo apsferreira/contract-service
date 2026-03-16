@@ -16,7 +16,7 @@ spec:
     - web
     - websecure
   routes:
-    - match: Host(`contract.institutoitinerante.com.br`)
+    - match: Host(`contracts.institutoitinerante.com.br`)
       kind: Rule
       services:
         - name: contract-service-frontend

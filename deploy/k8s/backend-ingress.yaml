@@ -16,7 +16,7 @@ spec:
     - web
     - websecure
   routes:
-    - match: Host(`contract.institutoitinerante.com.br`) && PathPrefix(`/api`)
+    - match: Host(`contracts.institutoitinerante.com.br`) && PathPrefix(`/api`)
       kind: Rule
       services:
         - name: contract-service
