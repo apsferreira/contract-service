@@ -259,7 +259,7 @@ INSERT INTO contract_templates (
     <ul>
         <li><strong>Redes sociais (LinkedIn/Instagram/Facebook):</strong> conforme solicitação do Contratante via OAuth</li>
         <li><strong>Provedores de IA:</strong> dados minimizados para geração de sugestões (sem PII quando possível)</li>
-        <li><strong>Gateway de pagamento:</strong> processamento de cobranças (Stripe/PagSeguro/etc.)</li>
+        <li><strong>Gateway de pagamento:</strong> processamento de cobranças (Asaas)</li>
         <li><strong>Resend:</strong> e-mail transacional de notificações</li>
         <li><strong>Cloudflare:</strong> CDN e proteção de rede (dados de tráfego)</li>
         <li><strong>Autoridades legais:</strong> quando exigido por lei ou ordem judicial</li>
