@@ -58,6 +58,8 @@ func main() {
 	app.Use(requestid.New())
 	app.Use(logger.New())
 	app.Use(recover.New())
+	app.Use(middleware.SecurityHeaders())
+	app.Use(middleware.RateLimit())
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
