@@ -53,7 +53,7 @@ INSERT INTO contract_templates (
     <h2>1. Identificação das Partes</h2>
     <p>
         <strong>CONTROLADORA E CONTRATADA:</strong> Instituto Itinerante de Tecnologia (doravante "IIT"),
-        CNPJ nº 00.000.000/0001-00, com sede em Salvador/BA,
+        CNPJ nº 64.826.421/0001-59, com sede em Salvador/BA,
         e-mail: contato@institutoitinerante.com.br.
     </p>
     <p>
@@ -86,9 +86,8 @@ INSERT INTO contract_templates (
     <h2>3. Dados Pessoais Coletados e Finalidade</h2>
 
     <div class="dados-info">
-        O tratamento de dados é realizado com base no <strong>consentimento</strong> (Art. 7º, I da LGPD),
-        na <strong>execução do contrato</strong> (Art. 7º, II) e no <strong>legítimo interesse</strong>
-        para melhoria do serviço (Art. 7º, IX), conforme detalhado abaixo.
+        O tratamento de dados é realizado com base no <strong>consentimento</strong> (Art. 7º, I da LGPD) e
+        na <strong>execução contratual</strong> (Art. 7º, V), conforme detalhado abaixo.
     </div>
 
     <table>
@@ -163,26 +162,32 @@ INSERT INTO contract_templates (
         de <strong>30 dias</strong> por e-mail.
     </p>
 
-    <h2>6. Direito de Arrependimento</h2>
+    <h2>6. Direito de Arrependimento (CDC Art. 49)</h2>
     <p>
-        Conforme o Art. 49 do Código de Defesa do Consumidor, o Usuário tem <strong>7 (sete) dias corridos</strong>
-        a partir desta data para desistir da contratação, com direito a reembolso integral, sem necessidade
-        de justificativa. Para exercer este direito: contato@institutoitinerante.com.br.
+        Em caso de arrependimento dentro de <strong>7 (sete) dias corridos</strong> da contratação, o valor pago
+        será integralmente reembolsado de forma automática ao meio de pagamento original, conforme Art. 49 do CDC.
+        Para exercer este direito: <strong>suporte@institutoitinerante.com.br</strong>.
     </p>
 
-    <h2>7. Cancelamento após 7 dias</h2>
+    <h2>7. Cancelamento</h2>
     <p>
-        Após o período de arrependimento, o cancelamento pode ser feito a qualquer momento pela plataforma.
-        O acesso continua até o fim do ciclo de pagamento vigente. <strong>Não há multa rescisória.</strong>
-        Valores já pagos não são reembolsados proporcionalmente, exceto em caso de falha comprovada do serviço.
+        O CONTRATANTE pode cancelar sua assinatura a qualquer momento, sem multa, fidelidade ou penalidade.
+        O cancelamento pode ser feito pela plataforma ou por e-mail para
+        <strong>suporte@institutoitinerante.com.br</strong>.
+        O acesso continua até o fim do ciclo de pagamento vigente.
     </p>
 
     <h2>8. Disponibilidade (SLA)</h2>
     <p>
-        O IIT se compromete com disponibilidade mínima de <strong>99% mensal</strong>.
-        Em caso de indisponibilidade superior a 1% no mês, o Usuário terá direito a crédito proporcional.
-        Manutenções programadas serão informadas com antecedência mínima de 24 horas.
+        O IIT se compromete com disponibilidade mínima de <strong>99,5% (noventa e nove vírgula cinco por cento)
+        por mês</strong>, calculada em tempo de funcionamento da API e dashboard.
     </p>
+    <ul>
+        <li><strong>Janela de manutenção programada:</strong> domingos, das 02h às 06h (horário de Brasília)</li>
+        <li><strong>Suporte por e-mail:</strong> resposta em até 48 (quarenta e oito) horas úteis</li>
+        <li><strong>Crédito por violação:</strong> em caso de indisponibilidade superior a 0,5% no mês,
+            o Usuário terá direito a crédito proporcional no próximo ciclo de cobrança</li>
+    </ul>
 
     <h2>9. Compartilhamento de Dados com Terceiros</h2>
     <p>O IIT <strong>não vende dados pessoais</strong>. Compartilhamento ocorre apenas com:</p>
@@ -212,7 +217,20 @@ INSERT INTO contract_templates (
         <li><strong>Oposição</strong> ao tratamento baseado em legítimo interesse</li>
         <li><strong>Revogação do consentimento</strong> para funcionalidades de IA</li>
     </ul>
-    <p>Solicitações via: privacidade@institutoitinerante.com.br (resposta em até 15 dias úteis)</p>
+    <p>Solicitações via: <strong>dpo@institutoitinerante.com.br</strong> (resposta em até 15 dias úteis)</p>
+
+    <h3>11.1. Retenção de Dados</h3>
+    <ul>
+        <li><strong>Dados de uso:</strong> 6 meses após cancelamento</li>
+        <li><strong>Dados fiscais (NFS-e, pagamentos):</strong> 5 anos conforme CTN Art. 174</li>
+        <li><strong>Registro de aceite contratual:</strong> 10 anos (imutável, obrigação legal)</li>
+    </ul>
+
+    <h3>11.2. Anonimização</h3>
+    <p>
+        Após a exclusão dos dados pessoais, dados de analytics serão <strong>anonimizados</strong> e poderão
+        ser mantidos para fins estatísticos agregados, sem possibilidade de reidentificação do titular.
+    </p>
 
     <h2>12. Propriedade Intelectual</h2>
     <p>
@@ -250,7 +268,7 @@ INSERT INTO contract_templates (
         </p>
         <p>
             <strong>CONTRATADA/CONTROLADORA:</strong> Instituto Itinerante de Tecnologia<br>
-            <strong>CNPJ:</strong> 00.000.000/0001-00<br>
+            <strong>CNPJ:</strong> 64.826.421/0001-59<br>
             <strong>E-mail:</strong> contato@institutoitinerante.com.br
         </p>
         <p style="margin-top: 28px; font-style: italic; color: #6b7280; font-size: 0.9rem;">

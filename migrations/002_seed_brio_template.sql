@@ -64,32 +64,93 @@ INSERT INTO contract_templates (
 
     <h2>4. Vigência e Renovação</h2>
     <p>
-        Este contrato terá vigência de 12 (doze) meses a partir da data de aceite, renovando-se automaticamente
-        por períodos sucessivos de igual duração, salvo manifestação contrária de qualquer das partes com 
-        antecedência mínima de 30 (trinta) dias.
+        Este contrato terá vigência por prazo indeterminado, renovando-se automaticamente a cada ciclo
+        de cobrança (mensal ou anual, conforme o plano contratado).
     </p>
 
     <h2>5. Cancelamento</h2>
     <p>
-        O CONTRATANTE poderá cancelar o serviço a qualquer momento através da plataforma, com efeito imediato.
-        Não há multa rescisória. Valores já pagos não são reembolsáveis proporcionalmente.
+        O CONTRATANTE pode cancelar sua assinatura a qualquer momento, sem multa, fidelidade ou penalidade.
+        O cancelamento pode ser feito diretamente pela plataforma ou por e-mail para
+        <strong>suporte@institutoitinerante.com.br</strong>. O acesso continua até o fim do ciclo de
+        pagamento vigente.
     </p>
 
-    <h2>6. Propriedade Intelectual</h2>
+    <h2>6. Direito de Arrependimento (CDC Art. 49)</h2>
     <p>
-        Todo o software, algoritmos e materiais fornecidos permanecem propriedade exclusiva do 
+        Em caso de arrependimento dentro de <strong>7 (sete) dias corridos</strong> da contratação, o valor pago
+        será integralmente reembolsado de forma automática ao meio de pagamento original, conforme Art. 49 do CDC.
+        Para exercer este direito: <strong>suporte@institutoitinerante.com.br</strong>.
+    </p>
+
+    <h2>7. Proteção de Dados (LGPD — Lei 13.709/2018)</h2>
+
+    <h3>7.1. Base Legal</h3>
+    <p>
+        O tratamento de dados pessoais é realizado com base no <strong>consentimento do titular</strong>
+        (Art. 7º, I da LGPD) e na <strong>execução contratual</strong> (Art. 7º, V da LGPD).
+    </p>
+
+    <h3>7.2. Dados Coletados e Finalidade</h3>
+    <ul>
+        <li><strong>Nome, e-mail, CPF/CNPJ:</strong> identificação, autenticação, faturamento e emissão de NFS-e</li>
+        <li><strong>Dados de uso da plataforma:</strong> prestação do serviço, métricas de qualidade, comunicação</li>
+        <li><strong>Dados de pagamento:</strong> processados via gateway (Stripe/PagSeguro) — o IIT não armazena dados de cartão</li>
+        <li><strong>Endereço IP e User-Agent:</strong> segurança e prevenção a fraudes</li>
+    </ul>
+
+    <h3>7.3. Compartilhamento com Terceiros</h3>
+    <p>O IIT <strong>não vende dados pessoais</strong>. Compartilhamento ocorre apenas com operadores/processadores:</p>
+    <ul>
+        <li><strong>Stripe/PagSeguro:</strong> processamento de pagamentos</li>
+        <li><strong>Resend:</strong> e-mail transacional</li>
+        <li><strong>Cloudflare:</strong> CDN e proteção de rede</li>
+        <li><strong>Provedores de IA:</strong> dados minimizados para funcionalidades inteligentes</li>
+        <li><strong>Autoridades legais:</strong> quando exigido por lei ou ordem judicial</li>
+    </ul>
+
+    <h3>7.4. Retenção de Dados</h3>
+    <ul>
+        <li><strong>Dados de uso:</strong> 6 meses após cancelamento</li>
+        <li><strong>Dados fiscais (NFS-e, pagamentos):</strong> 5 anos conforme CTN Art. 174</li>
+        <li><strong>Registro de aceite contratual:</strong> 10 anos (imutável, obrigação legal)</li>
+    </ul>
+
+    <h3>7.5. Direitos do Titular (Art. 18 LGPD)</h3>
+    <p>O CONTRATANTE pode exercer os seguintes direitos via <strong>dpo@institutoitinerante.com.br</strong>:</p>
+    <ul>
+        <li><strong>Acesso:</strong> obter cópia dos dados pessoais tratados</li>
+        <li><strong>Correção:</strong> atualizar dados incompletos ou desatualizados</li>
+        <li><strong>Exclusão:</strong> solicitar eliminação dos dados (ressalvadas obrigações legais de retenção)</li>
+        <li><strong>Portabilidade:</strong> exportação dos dados em formato estruturado (JSON/CSV)</li>
+    </ul>
+
+    <h3>7.6. Anonimização</h3>
+    <p>
+        Após a exclusão dos dados pessoais, dados de analytics serão anonimizados e poderão ser mantidos
+        para fins estatísticos agregados, sem possibilidade de reidentificação do titular.
+    </p>
+
+    <h2>8. Disponibilidade (SLA)</h2>
+    <p>
+        O IIT se compromete com disponibilidade mínima de <strong>99,5% (noventa e nove vírgula cinco por cento)
+        por mês</strong>, calculada em tempo de funcionamento da API e dashboard.
+    </p>
+    <ul>
+        <li><strong>Janela de manutenção programada:</strong> domingos, das 02h às 06h (horário de Brasília)</li>
+        <li><strong>Suporte por e-mail:</strong> resposta em até 48 (quarenta e oito) horas úteis</li>
+        <li><strong>Crédito por violação:</strong> em caso de indisponibilidade superior a 0,5% no mês,
+            o CONTRATANTE terá direito a crédito proporcional no próximo ciclo de cobrança</li>
+    </ul>
+
+    <h2>9. Propriedade Intelectual</h2>
+    <p>
+        Todo o software, algoritmos e materiais fornecidos permanecem propriedade exclusiva do
         <strong>Instituto Itinerante de Tecnologia</strong>. O CONTRATANTE recebe apenas licença de uso
         enquanto o contrato estiver ativo.
     </p>
 
-    <h2>7. Proteção de Dados (LGPD)</h2>
-    <p>
-        As partes declaram estar cientes da Lei Geral de Proteção de Dados (Lei 13.709/2018). 
-        O tratamento de dados pessoais será realizado conforme nossa Política de Privacidade,
-        disponível em <strong>{{privacy_policy_url}}</strong>.
-    </p>
-
-    <h2>8. Limitação de Responsabilidade</h2>
+    <h2>10. Limitação de Responsabilidade</h2>
     <p>
         O CONTRATADO não se responsabiliza por:
     </p>
@@ -99,7 +160,7 @@ INSERT INTO contract_templates (
         <li>Danos indiretos, lucros cessantes ou danos morais</li>
     </ul>
 
-    <h2>9. Foro</h2>
+    <h2>11. Foro</h2>
     <p>
         Fica eleito o foro da Comarca de <strong>Salvador/BA</strong> para dirimir quaisquer questões 
         oriundas deste contrato.
@@ -113,7 +174,7 @@ INSERT INTO contract_templates (
         </p>
         <p>
             <strong>CONTRATADA:</strong> Instituto Itinerante de Tecnologia<br>
-            <strong>CNPJ:</strong> 00.000.000/0001-00<br>
+            <strong>CNPJ:</strong> 64.826.421/0001-59<br>
             <strong>Email:</strong> contato@institutoitinerante.com.br
         </p>
         <p style="margin-top: 30px;">

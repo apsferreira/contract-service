@@ -52,7 +52,7 @@ INSERT INTO contract_templates (
     <h2>1. Identificação das Partes</h2>
     <p>
         <strong>CONTROLADORA DE DADOS:</strong> Instituto Itinerante de Tecnologia (doravante "IIT"),
-        CNPJ nº 00.000.000/0001-00, com sede em Salvador/BA,
+        CNPJ nº 64.826.421/0001-59, com sede em Salvador/BA,
         e-mail: contato@institutoitinerante.com.br.
     </p>
     <p>
@@ -78,8 +78,8 @@ INSERT INTO contract_templates (
 
     <div class="dados-info">
         Conforme o Art. 7º da LGPD, o tratamento de dados pessoais é realizado com base no
-        <strong>consentimento do titular</strong> (Art. 7º, I) e no <strong>legítimo interesse</strong>
-        do controlador para prestação do serviço (Art. 7º, IX).
+        <strong>consentimento do titular</strong> (Art. 7º, I) e na <strong>execução contratual</strong>
+        (Art. 7º, V).
     </div>
 
     <table>
@@ -166,7 +166,7 @@ INSERT INTO contract_templates (
 
     <h2>7. Direitos do Titular dos Dados (Art. 18 da LGPD)</h2>
     <p>O Usuário possui os seguintes direitos, exercíveis a qualquer momento via
-    contato@institutoitinerante.com.br:</p>
+    <strong>dpo@institutoitinerante.com.br</strong>:</p>
     <ul>
         <li><strong>Acesso:</strong> obter cópia dos dados pessoais tratados</li>
         <li><strong>Correção:</strong> atualizar dados incompletos ou desatualizados</li>
@@ -178,40 +178,59 @@ INSERT INTO contract_templates (
 
     <h2>8. Prazo de Vigência e Cancelamento</h2>
     <p>
-        O serviço Libri é prestado por prazo <strong>indeterminado</strong>. O Usuário pode
-        encerrar sua conta a qualquer momento através das configurações da plataforma,
-        sem ônus ou penalidade.
+        O serviço Libri é prestado por prazo <strong>indeterminado</strong>.
+        O CONTRATANTE pode cancelar sua assinatura a qualquer momento, sem multa, fidelidade ou penalidade,
+        através das configurações da plataforma ou por e-mail para
+        <strong>suporte@institutoitinerante.com.br</strong>.
     </p>
     <p>
         Em caso de encerramento da conta: os dados de livros, notas e perfil serão excluídos
-        em até <strong>30 dias</strong>. O registro deste aceite e os logs de auditoria serão
+        em até <strong>30 dias</strong>. Dados de uso são retidos por <strong>6 meses</strong> após o cancelamento.
+        Dados fiscais são retidos por <strong>5 anos</strong> conforme CTN Art. 174.
+        O registro deste aceite e os logs de auditoria serão
         mantidos por <strong>10 anos</strong> conforme obrigação legal (LGPD, Art. 16, I;
         Código Civil, Art. 205).
     </p>
-
-    <h2>9. Direito de Arrependimento</h2>
     <p>
-        Conforme o Art. 49 do Código de Defesa do Consumidor, o Usuário tem o prazo de
-        <strong>7 (sete) dias corridos</strong>, a contar da data deste aceite, para desistir
-        da contratação do serviço e solicitar a exclusão imediata de todos os dados,
-        sem qualquer ônus.
+        Após a exclusão dos dados pessoais, dados de analytics serão <strong>anonimizados</strong> e poderão
+        ser mantidos para fins estatísticos agregados, sem possibilidade de reidentificação do titular.
     </p>
 
-    <h2>10. Contato do Encarregado de Dados (DPO)</h2>
+    <h2>9. Direito de Arrependimento (CDC Art. 49)</h2>
+    <p>
+        Em caso de arrependimento dentro de <strong>7 (sete) dias corridos</strong> da contratação,
+        o valor pago será integralmente reembolsado de forma automática ao meio de pagamento original,
+        conforme Art. 49 do CDC. Para exercer este direito:
+        <strong>suporte@institutoitinerante.com.br</strong>.
+    </p>
+
+    <h2>10. Disponibilidade (SLA)</h2>
+    <p>
+        O IIT se compromete com disponibilidade mínima de <strong>99,5% (noventa e nove vírgula cinco por cento)
+        por mês</strong>, calculada em tempo de funcionamento da API e dashboard.
+    </p>
+    <ul>
+        <li><strong>Janela de manutenção programada:</strong> domingos, das 02h às 06h (horário de Brasília)</li>
+        <li><strong>Suporte por e-mail:</strong> resposta em até 48 (quarenta e oito) horas úteis</li>
+        <li><strong>Crédito por violação:</strong> em caso de indisponibilidade superior a 0,5% no mês,
+            o Usuário terá direito a crédito proporcional no próximo ciclo de cobrança</li>
+    </ul>
+
+    <h2>11. Contato do Encarregado de Dados (DPO)</h2>
     <p>
         Para exercer seus direitos ou esclarecer dúvidas sobre o tratamento de dados:<br>
-        <strong>E-mail:</strong> privacidade@institutoitinerante.com.br<br>
+        <strong>E-mail:</strong> dpo@institutoitinerante.com.br<br>
         <strong>Endereço:</strong> Salvador, BA — Brasil
     </p>
 
-    <h2>11. Alterações neste Termo</h2>
+    <h2>12. Alterações neste Termo</h2>
     <p>
         O IIT poderá atualizar este Termo. Alterações substanciais serão comunicadas por e-mail
         com antecedência mínima de 15 dias, e um novo aceite será solicitado caso as mudanças
         ampliem o escopo do tratamento de dados.
     </p>
 
-    <h2>12. Foro</h2>
+    <h2>13. Foro</h2>
     <p>
         Fica eleito o foro da Comarca de <strong>Salvador/BA</strong> para dirimir quaisquer
         questões oriundas deste Termo, conforme Art. 101, I do CDC (foro do domicílio do consumidor
@@ -225,7 +244,7 @@ INSERT INTO contract_templates (
         </p>
         <p>
             <strong>CONTROLADORA:</strong> Instituto Itinerante de Tecnologia<br>
-            <strong>CNPJ:</strong> 00.000.000/0001-00<br>
+            <strong>CNPJ:</strong> 64.826.421/0001-59<br>
             <strong>E-mail:</strong> contato@institutoitinerante.com.br
         </p>
         <p style="margin-top: 28px; font-style: italic; color: #6b7280; font-size: 0.9rem;">
