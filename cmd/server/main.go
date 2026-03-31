@@ -30,7 +30,7 @@ func main() {
 		log.Fatal("DATABASE_URL environment variable is required")
 	}
 	if cfg.JWTSecret == "" {
-		log.Println("⚠️  JWT_SECRET not set — authentication will be insecure")
+		log.Fatalf("JWT_SECRET environment variable is required — refusing to start without it")
 	}
 
 	dbPool, err := database.Connect(cfg.DatabaseURL)
@@ -61,7 +61,7 @@ func main() {
 	app.Use(middleware.SecurityHeaders())
 	app.Use(middleware.RateLimit())
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
+		AllowOrigins: cfg.CORSOrigins,
 		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
 		AllowHeaders: "Accept,Authorization,Content-Type,X-CSRF-Token",
 	}))
@@ -75,11 +75,14 @@ func main() {
 	api := app.Group("/api/v1")
 
 	templates := api.Group("/templates")
-	templates.Post("/", templateHandler.CreateTemplate)
+	// Leitura pública
 	templates.Get("/", templateHandler.ListTemplates)
 	templates.Get("/:id", templateHandler.GetTemplate)
-	templates.Put("/:id", templateHandler.UpdateTemplate)
-	templates.Post("/:id/activate", templateHandler.ActivateTemplate)
+	// Escrita requer JWT com role "admin"
+	templatesAdmin := templates.Group("", middleware.JWTMiddleware(cfg.JWTSecret), middleware.RequireRole("admin"))
+	templatesAdmin.Post("/", templateHandler.CreateTemplate)
+	templatesAdmin.Put("/:id", templateHandler.UpdateTemplate)
+	templatesAdmin.Post("/:id/activate", templateHandler.ActivateTemplate)
 
 	contracts := api.Group("/contracts")
 	contracts.Post("/", contractHandler.CreateContract)

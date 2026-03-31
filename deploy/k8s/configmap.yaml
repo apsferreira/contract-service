@@ -13,3 +13,4 @@ data:
   log-level: "info"
   enable-metrics: "true"
   enable-tracing: "true"
+  cors-origins: "https://contracts.institutoitinerante.com.br"

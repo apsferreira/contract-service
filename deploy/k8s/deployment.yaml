@@ -42,6 +42,11 @@ spec:
             secretKeyRef:
               name: contract-service-secrets
               key: jwt-secret
+        - name: CORS_ORIGINS
+          valueFrom:
+            configMapKeyRef:
+              name: contract-service-config
+              key: cors-origins
         - name: OTEL_SERVICE_NAME
           value: "contract-service"
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
