@@ -92,13 +92,14 @@ func (h *ContractHandler) AcceptContract(c *fiber.Ctx) error {
 	if err != nil {
 		status := fiber.StatusInternalServerError
 		errMsg := err.Error()
-		if errMsg == "contract not found" {
+		switch errMsg {
+		case "contract not found":
 			status = fiber.StatusNotFound
-		} else if errMsg == "unauthorized: contract belongs to different user" {
+		case "unauthorized: contract belongs to different user":
 			status = fiber.StatusForbidden
-		} else if errMsg == "contract already accepted" {
+		case "contract already accepted":
 			status = fiber.StatusConflict
-		} else if errMsg == "contract expired" {
+		case "contract expired":
 			status = fiber.StatusGone
 		}
 		return c.Status(status).JSON(fiber.Map{"error": errMsg})
