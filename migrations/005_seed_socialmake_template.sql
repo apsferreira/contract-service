@@ -324,11 +324,8 @@ INSERT INTO contract_templates (
         </p>
         <p style="margin-top: 28px; font-style: italic; color: #6b7280; font-size: 0.9rem;">
             Aceite eletrônico realizado em {{acceptance_date}} às {{acceptance_time}}<br>
-            IP de origem: {{user_ip}} · Dispositivo: {{user_agent}}<br>
-            Hash do documento (SHA-256): {{content_hash}}<br>
-            Hash anterior na cadeia: {{prev_hash}}<br>
-            <br>
-            Fundamentação jurídica: MP 2.200-2/2001 (assinatura eletrônica simples),<br>
+            {{signature_block}}<br>
+            Fundamentação jurídica: MP 2.200-2/2001,<br>
             Lei 14.063/2020, Lei 13.709/2018 (LGPD), CDC Art. 49
         </p>
     </div>

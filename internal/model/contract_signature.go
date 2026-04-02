@@ -20,9 +20,9 @@ type ContractSignature struct {
 }
 
 type AcceptContractRequest struct {
-	IPAddress        string `json:"ip_address" validate:"required"`
-	UserAgent        string `json:"user_agent" validate:"required"`
-	SessionTokenHash string `json:"session_token_hash" validate:"required"`
+	IPAddress        string `json:"ip_address"`
+	UserAgent        string `json:"user_agent"`
+	SessionTokenHash string `json:"session_token_hash"`
 }
 
 type AcceptContractResponse struct {

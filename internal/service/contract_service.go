@@ -128,11 +128,16 @@ func (s *contractService) AcceptContract(ctx context.Context, contractID uuid.UU
 	if prevHash != nil {
 		prevHashStr = *prevHash
 	}
+	signatureBlock := fmt.Sprintf(
+		"IP de origem: %s · Dispositivo: %s<br>Hash do documento (SHA-256): %s<br>Hash anterior na cadeia: %s",
+		req.IPAddress, req.UserAgent, contract.ContentHash, prevHashStr,
+	)
 	signatureVars := map[string]any{
-		"user_ip":      req.IPAddress,
-		"user_agent":   req.UserAgent,
-		"content_hash": contract.ContentHash,
-		"prev_hash":    prevHashStr,
+		"user_ip":         req.IPAddress,
+		"user_agent":      req.UserAgent,
+		"content_hash":    contract.ContentHash,
+		"prev_hash":       prevHashStr,
+		"signature_block": signatureBlock,
 	}
 	finalHTML := s.renderTemplate(contract.ContentHTML, signatureVars)
 	finalHash := s.calculateSHA256(finalHTML)

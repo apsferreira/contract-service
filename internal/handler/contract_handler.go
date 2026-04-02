@@ -1,6 +1,9 @@
 package handler
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -75,9 +78,14 @@ func (h *ContractHandler) AcceptContract(c *fiber.Ctx) error {
 	if req.UserAgent == "" {
 		req.UserAgent = c.Get("User-Agent")
 	}
-
-	if err := h.validate.Struct(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	if req.SessionTokenHash == "" {
+		// Gera hash do token JWT para registro de auditoria
+		authHeader := c.Get("Authorization")
+		if len(authHeader) > 7 {
+			token := authHeader[7:] // Remove "Bearer "
+			hash := sha256.Sum256([]byte(token))
+			req.SessionTokenHash = hex.EncodeToString(hash[:])
+		}
 	}
 
 	response, err := h.service.AcceptContract(c.Context(), contractID, userID, &req)
