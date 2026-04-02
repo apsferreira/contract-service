@@ -123,6 +123,24 @@ func (s *contractService) AcceptContract(ctx context.Context, contractID uuid.UU
 		return nil, fmt.Errorf("failed to create signature: %w", err)
 	}
 
+	// Re-renderizar HTML com variáveis de assinatura digital (só disponíveis agora).
+	prevHashStr := ""
+	if prevHash != nil {
+		prevHashStr = *prevHash
+	}
+	signatureVars := map[string]any{
+		"user_ip":      req.IPAddress,
+		"user_agent":   req.UserAgent,
+		"content_hash": contract.ContentHash,
+		"prev_hash":    prevHashStr,
+	}
+	finalHTML := s.renderTemplate(contract.ContentHTML, signatureVars)
+	finalHash := s.calculateSHA256(finalHTML)
+
+	if err := s.contractRepo.UpdateContent(ctx, contractID, finalHTML, finalHash); err != nil {
+		return nil, fmt.Errorf("failed to update contract content: %w", err)
+	}
+
 	if err := s.contractRepo.UpdateStatus(ctx, contractID, model.ContractStatusAccepted); err != nil {
 		return nil, fmt.Errorf("failed to update contract status: %w", err)
 	}

@@ -15,6 +15,7 @@ type ContractRepository interface {
 	Create(ctx context.Context, contract *model.Contract) error
 	GetByID(ctx context.Context, id uuid.UUID) (*model.Contract, error)
 	UpdateStatus(ctx context.Context, id uuid.UUID, status model.ContractStatus) error
+	UpdateContent(ctx context.Context, id uuid.UUID, contentHTML, contentHash string) error
 	UpdatePDFPath(ctx context.Context, id uuid.UUID, pdfPath string) error
 	ListByUser(ctx context.Context, userID uuid.UUID, limit, offset int) ([]model.Contract, int, error)
 }
@@ -85,6 +86,12 @@ func (r *contractRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.
 func (r *contractRepository) UpdateStatus(ctx context.Context, id uuid.UUID, status model.ContractStatus) error {
 	query := `UPDATE contracts SET status = $1 WHERE id = $2`
 	_, err := r.db.Exec(ctx, query, status, id)
+	return err
+}
+
+func (r *contractRepository) UpdateContent(ctx context.Context, id uuid.UUID, contentHTML, contentHash string) error {
+	query := `UPDATE contracts SET content_html = $1, content_hash = $2 WHERE id = $3`
+	_, err := r.db.Exec(ctx, query, contentHTML, contentHash, id)
 	return err
 }
 
