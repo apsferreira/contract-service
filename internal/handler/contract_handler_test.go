@@ -14,6 +14,9 @@ import (
 	"github.com/institutoitinerante/contract-service/internal/model"
 )
 
+// fixedUserID é o UUID fixo usado nos testes para simular o dono do contrato
+var fixedUserID = uuid.MustParse("00000000-0000-0000-0000-000000000001")
+
 type mockContractService struct{}
 
 func (m *mockContractService) CreateContract(ctx context.Context, req *model.CreateContractRequest) (*model.CreateContractResponse, error) {
@@ -35,7 +38,7 @@ func (m *mockContractService) AcceptContract(ctx context.Context, contractID uui
 func (m *mockContractService) GetContract(ctx context.Context, id uuid.UUID) (*model.Contract, error) {
 	return &model.Contract{
 		ID:          id,
-		UserID:      uuid.New(),
+		UserID:      fixedUserID,
 		ProductType: "brio",
 		Status:      model.ContractStatusPending,
 	}, nil
@@ -49,10 +52,13 @@ func TestCreateContractHandler(t *testing.T) {
 	app := fiber.New()
 	handler := NewContractHandler(&mockContractService{})
 
-	app.Post("/contracts", handler.CreateContract)
+	// Rota com middleware simulado que injeta o claim JWT (SEC-002)
+	app.Post("/contracts", func(c *fiber.Ctx) error {
+		c.Locals("user", &middleware.Claims{UserID: fixedUserID.String()})
+		return handler.CreateContract(c)
+	})
 
 	reqBody := map[string]any{
-		"user_id":      uuid.New().String(),
 		"product_type": "brio",
 		"variables":    map[string]any{"user_name": "Test User"},
 	}

@@ -85,10 +85,10 @@ func main() {
 	templatesAdmin.Post("/:id/activate", templateHandler.ActivateTemplate)
 
 	contracts := api.Group("/contracts")
-	contracts.Post("/", contractHandler.CreateContract)
-	contracts.Get("/:id", contractHandler.GetContract)
-	
+	// Todas as rotas de contratos exigem JWT (SEC-002, SEC-011)
 	contractsAuth := contracts.Use(middleware.JWTMiddleware(cfg.JWTSecret))
+	contractsAuth.Post("/", contractHandler.CreateContract)
+	contractsAuth.Get("/:id", contractHandler.GetContract)
 	contractsAuth.Post("/:id/accept", contractHandler.AcceptContract)
 	contractsAuth.Get("/", contractHandler.ListUserContracts)
 

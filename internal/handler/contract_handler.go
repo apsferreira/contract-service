@@ -22,10 +22,19 @@ func NewContractHandler(service service.ContractService) *ContractHandler {
 }
 
 func (h *ContractHandler) CreateContract(c *fiber.Ctx) error {
+	claims := c.Locals("user").(*middleware.Claims)
+	userID, err := uuid.Parse(claims.UserID)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid user id in token"})
+	}
+
 	var req model.CreateContractRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid request body"})
 	}
+
+	// Sobrescreve o user_id do body com o do JWT para evitar IDOR (SEC-002)
+	req.UserID = userID
 
 	if err := h.validate.Struct(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
@@ -96,6 +105,12 @@ func (h *ContractHandler) GetContract(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid contract id"})
 	}
 
+	claims := c.Locals("user").(*middleware.Claims)
+	requesterID, err := uuid.Parse(claims.UserID)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid user id in token"})
+	}
+
 	contract, err := h.service.GetContract(c.Context(), contractID)
 	if err != nil {
 		status := fiber.StatusInternalServerError
@@ -103,6 +118,11 @@ func (h *ContractHandler) GetContract(c *fiber.Ctx) error {
 			status = fiber.StatusNotFound
 		}
 		return c.Status(status).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	// Valida ownership para evitar IDOR (SEC-011)
+	if contract.UserID != requesterID {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "acesso negado"})
 	}
 
 	return c.JSON(contract)
