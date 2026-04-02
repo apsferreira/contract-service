@@ -31,6 +31,14 @@ func (m *mockContractRepo) UpdateStatus(ctx context.Context, id uuid.UUID, statu
 	return nil
 }
 
+func (m *mockContractRepo) UpdateContent(ctx context.Context, id uuid.UUID, contentHTML, contentHash string) error {
+	if c, ok := m.contracts[id]; ok {
+		c.ContentHTML = contentHTML
+		c.ContentHash = contentHash
+	}
+	return nil
+}
+
 func (m *mockContractRepo) UpdatePDFPath(ctx context.Context, id uuid.UUID, pdfPath string) error {
 	if c, ok := m.contracts[id]; ok {
 		c.PDFPath = &pdfPath
