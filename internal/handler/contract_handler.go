@@ -26,7 +26,7 @@ func NewContractHandler(service service.ContractService) *ContractHandler {
 
 func (h *ContractHandler) CreateContract(c *fiber.Ctx) error {
 	claims := c.Locals("user").(*middleware.Claims)
-	userID, err := uuid.Parse(claims.UserID)
+	userID, err := uuid.Parse(claims.GetUserID())
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid user id in token"})
 	}
@@ -62,7 +62,7 @@ func (h *ContractHandler) AcceptContract(c *fiber.Ctx) error {
 	}
 
 	claims := c.Locals("user").(*middleware.Claims)
-	userID, err := uuid.Parse(claims.UserID)
+	userID, err := uuid.Parse(claims.GetUserID())
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid user id in token"})
 	}
@@ -115,7 +115,7 @@ func (h *ContractHandler) GetContract(c *fiber.Ctx) error {
 	}
 
 	claims := c.Locals("user").(*middleware.Claims)
-	requesterID, err := uuid.Parse(claims.UserID)
+	requesterID, err := uuid.Parse(claims.GetUserID())
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid user id in token"})
 	}
@@ -139,7 +139,7 @@ func (h *ContractHandler) GetContract(c *fiber.Ctx) error {
 
 func (h *ContractHandler) ListUserContracts(c *fiber.Ctx) error {
 	claims := c.Locals("user").(*middleware.Claims)
-	userID, err := uuid.Parse(claims.UserID)
+	userID, err := uuid.Parse(claims.GetUserID())
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid user id in token"})
 	}

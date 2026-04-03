@@ -14,6 +14,15 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+// GetUserID retorna o user ID do token, priorizando o campo custom "user_id"
+// e usando "sub" (Subject) como fallback — compatível com auth-service.
+func (c *Claims) GetUserID() string {
+	if c.UserID != "" {
+		return c.UserID
+	}
+	return c.Subject
+}
+
 func JWTMiddleware(secret string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")
