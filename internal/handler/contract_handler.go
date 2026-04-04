@@ -115,10 +115,7 @@ func (h *ContractHandler) GetContract(c *fiber.Ctx) error {
 	}
 
 	claims := c.Locals("user").(*middleware.Claims)
-	requesterID, err := uuid.Parse(claims.GetUserID())
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid user id in token"})
-	}
+	isServiceCall := claims.GetUserID() == "service"
 
 	contract, err := h.service.GetContract(c.Context(), contractID)
 	if err != nil {
@@ -127,6 +124,18 @@ func (h *ContractHandler) GetContract(c *fiber.Ctx) error {
 			status = fiber.StatusNotFound
 		}
 		return c.Status(status).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	// Service tokens (interservice) podem consultar qualquer contrato.
+	// Usuários normais só podem ver seus próprios contratos (IDOR protection).
+	if !isServiceCall {
+		requesterID, err := uuid.Parse(claims.GetUserID())
+		if err != nil {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid user id in token"})
+		}
+		if contract.UserID != requesterID {
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "acesso negado"})
+		}
 	}
 
 	// Valida ownership para evitar IDOR (SEC-011)
