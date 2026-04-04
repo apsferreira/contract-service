@@ -138,11 +138,6 @@ func (h *ContractHandler) GetContract(c *fiber.Ctx) error {
 		}
 	}
 
-	// Valida ownership para evitar IDOR (SEC-011)
-	if contract.UserID != requesterID {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "acesso negado"})
-	}
-
 	return c.JSON(contract)
 }
 
