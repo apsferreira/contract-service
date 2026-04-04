@@ -86,7 +86,7 @@ func main() {
 
 	contracts := api.Group("/contracts")
 	// Todas as rotas de contratos exigem JWT (SEC-002, SEC-011)
-	contractsAuth := contracts.Use(middleware.JWTMiddleware(cfg.JWTSecret))
+	contractsAuth := contracts.Use(middleware.JWTMiddleware(cfg.JWTSecret, cfg.ServiceToken))
 	contractsAuth.Post("/", contractHandler.CreateContract)
 	contractsAuth.Get("/:id", contractHandler.GetContract)
 	contractsAuth.Post("/:id/accept", contractHandler.AcceptContract)

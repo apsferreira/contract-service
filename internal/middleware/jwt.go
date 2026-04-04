@@ -23,7 +23,15 @@ func (c *Claims) GetUserID() string {
 	return c.Subject
 }
 
-func JWTMiddleware(secret string) fiber.Handler {
+func JWTMiddleware(secret string, serviceTokens ...string) fiber.Handler {
+	// Mapa de service tokens aceitos para comunicação entre serviços
+	validServiceTokens := make(map[string]bool)
+	for _, st := range serviceTokens {
+		if st != "" {
+			validServiceTokens[st] = true
+		}
+	}
+
 	return func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")
 		if authHeader == "" {
@@ -33,6 +41,12 @@ func JWTMiddleware(secret string) fiber.Handler {
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		if tokenString == authHeader {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid authorization format"})
+		}
+
+		// Verifica se é um service token (comunicação entre serviços)
+		if validServiceTokens[tokenString] {
+			c.Locals("user", &Claims{UserID: "service", Email: "service@internal"})
+			return c.Next()
 		}
 
 		token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
