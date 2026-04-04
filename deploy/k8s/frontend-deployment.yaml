@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
       - name: contract-service-frontend
-        image: ghcr.io/apsferreira/contract-service-frontend:main-8b06b13
+        image: ghcr.io/apsferreira/contract-service-frontend:main-1109193
         ports:
         - containerPort: 80
           name: http
