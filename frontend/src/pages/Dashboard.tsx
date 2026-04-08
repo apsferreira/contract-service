@@ -1,204 +1,145 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/card';
-import {
-  FileSignature,
-  FileText,
-  CheckCircle,
-  Clock,
-  Shield
-} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/card';
+import { FileSignature, FileText, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
+import { contractsApi, templatesApi } from '../lib/api';
+import type { Contract, Template } from '../lib/api';
 
 export function Dashboard() {
-  // Mock data - would come from API
-  const stats = {
-    totalContracts: 2847,
-    acceptanceRate: 94.2,
-    activeTemplates: 8,
-    pendingAcceptance: 23,
-    expiredContracts: 5,
-    averageAcceptanceTime: '2.3 hours',
-  };
+  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const recentContracts = [
-    {
-      id: '1',
-      user_id: 'user-123',
-      product_type: 'brio',
-      template_version: '1.2',
-      status: 'accepted',
-      created_at: '2026-03-15T08:30:00Z',
-      expires_at: '2026-03-15T09:30:00Z',
-      accepted_at: '2026-03-15T08:45:00Z',
-    },
-    {
-      id: '2', 
-      user_id: 'user-456',
-      product_type: 'premium',
-      template_version: '2.0',
-      status: 'pending',
-      created_at: '2026-03-15T08:25:00Z',
-      expires_at: '2026-03-15T09:25:00Z',
-    },
-    {
-      id: '3',
-      user_id: 'user-789',
-      product_type: 'brio',
-      template_version: '1.2', 
-      status: 'expired',
-      created_at: '2026-03-15T07:00:00Z',
-      expires_at: '2026-03-15T08:00:00Z',
-    }
-  ];
+  useEffect(() => {
+    Promise.all([
+      contractsApi.list({ limit: 100 }),
+      templatesApi.list(),
+    ])
+      .then(([cData, tData]) => {
+        setContracts(cData.contracts ?? []);
+        setTemplates(tData ?? []);
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const totalContracts = contracts.length;
+  const accepted = contracts.filter((c) => c.status === 'accepted').length;
+  const pending = contracts.filter((c) => c.status === 'pending').length;
+  const expired = contracts.filter((c) => c.status === 'expired').length;
+  const acceptanceRate = totalContracts > 0 ? ((accepted / totalContracts) * 100).toFixed(1) : '0';
+  const activeTemplates = templates.filter((t) => t.is_active).length;
+
+  const recentContracts = [...contracts]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 5);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="w-6 h-6 border-2 border-gray-200 border-t-indigo-600 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+        <AlertTriangle className="inline w-4 h-4 mr-2" />
+        Erro ao carregar dados: {error}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="mt-2 text-gray-600">
-          Overview of contract service performance and activity
-        </p>
+        <p className="mt-2 text-gray-600">Visao geral do servico de contratos</p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Contracts
-            </CardTitle>
-            <FileSignature className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Total de Contratos</CardTitle>
+            <FileSignature className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalContracts.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              <span className="text-green-600">↗ +8%</span> from last month
-            </p>
+            <div className="text-2xl font-bold">{totalContracts}</div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Acceptance Rate
-            </CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Taxa de Aceite</CardTitle>
+            <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.acceptanceRate}%</div>
-            <p className="text-xs text-muted-foreground">
-              <span className="text-green-600">↗ +2.1%</span> from last week
-            </p>
+            <div className="text-2xl font-bold">{acceptanceRate}%</div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Active Templates
-            </CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Pendentes</CardTitle>
+            <Clock className="h-4 w-4 text-amber-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.activeTemplates}</div>
-            <p className="text-xs text-muted-foreground">
-              2 updated this week
-            </p>
+            <div className="text-2xl font-bold">{pending}</div>
+            {expired > 0 && <p className="text-xs text-red-500 mt-1">{expired} expirado(s)</p>}
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Pending Acceptance
-            </CardTitle>
-            <Clock className="h-4 w-4 text-yellow-600" />
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Templates Ativos</CardTitle>
+            <FileText className="h-4 w-4 text-indigo-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.pendingAcceptance}</div>
-            <p className="text-xs text-muted-foreground">
-              Avg: {stats.averageAcceptanceTime}
-            </p>
+            <div className="text-2xl font-bold">{activeTemplates}</div>
+            <p className="text-xs text-gray-400 mt-1">{templates.length} total</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Recent Activity */}
+      {/* Recent contracts */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Contract Activity</CardTitle>
-          <CardDescription>
-            Latest contract generations and acceptances
-          </CardDescription>
+          <CardTitle>Contratos Recentes</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {recentContracts.map((contract) => (
-              <div key={contract.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center space-x-4">
-                  <div className="flex-shrink-0">
-                    <FileSignature className="h-5 w-5 text-green-600" />
-                  </div>
+          {recentContracts.length === 0 ? (
+            <p className="text-sm text-gray-400 py-4 text-center">Nenhum contrato encontrado.</p>
+          ) : (
+            <div className="space-y-3">
+              {recentContracts.map((c) => (
+                <div key={c.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div>
                     <p className="text-sm font-medium text-gray-900">
-                      {contract.product_type.charAt(0).toUpperCase() + contract.product_type.slice(1)} Contract
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      User: {contract.user_id} • Version: {contract.template_version}
+                      {c.variables?.user_name || c.user_id}
                     </p>
                     <p className="text-xs text-gray-400">
-                      Expires: {new Date(contract.expires_at).toLocaleString()}
+                      {c.product_type} · {new Date(c.created_at).toLocaleDateString('pt-BR')}
                     </p>
                   </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    contract.status === 'accepted'
-                      ? 'bg-green-100 text-green-800'
-                      : contract.status === 'expired'
-                      ? 'bg-red-100 text-red-800'
-                      : 'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {contract.status}
+                  <span
+                    className={`text-xs font-medium px-2 py-1 rounded-full ${
+                      c.status === 'accepted'
+                        ? 'bg-green-100 text-green-700'
+                        : c.status === 'pending'
+                        ? 'bg-amber-100 text-amber-700'
+                        : c.status === 'expired'
+                        ? 'bg-red-100 text-red-600'
+                        : 'bg-gray-100 text-gray-600'
+                    }`}
+                  >
+                    {c.status === 'accepted' ? 'Aceito' : c.status === 'pending' ? 'Pendente' : c.status === 'expired' ? 'Expirado' : c.status}
                   </span>
-                  <span className="text-sm text-gray-500">
-                    {new Date(contract.created_at).toLocaleTimeString()}
-                  </span>
                 </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Security & Integrity Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Shield className="mr-2 h-5 w-5 text-green-600" />
-            Hash Chain Integrity
-          </CardTitle>
-          <CardDescription>
-            Blockchain-like audit trail verification status
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center p-4 border rounded bg-green-50">
-              <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-green-700">100%</p>
-              <p className="text-sm text-green-600">Hash Chain Intact</p>
+              ))}
             </div>
-            <div className="text-center p-4 border rounded">
-              <Shield className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-              <p className="text-2xl font-bold">SHA-256</p>
-              <p className="text-sm text-gray-600">Encryption Standard</p>
-            </div>
-            <div className="text-center p-4 border rounded">
-              <FileSignature className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-              <p className="text-2xl font-bold">2,847</p>
-              <p className="text-sm text-gray-600">Signed Contracts</p>
-            </div>
-          </div>
+          )}
         </CardContent>
       </Card>
     </div>
