@@ -9,18 +9,21 @@ import (
 	"github.com/google/uuid"
 	"github.com/institutoitinerante/contract-service/internal/middleware"
 	"github.com/institutoitinerante/contract-service/internal/model"
+	"github.com/institutoitinerante/contract-service/internal/pkg/pulse"
 	"github.com/institutoitinerante/contract-service/internal/service"
 )
 
 type ContractHandler struct {
-	service  service.ContractService
-	validate *validator.Validate
+	service     service.ContractService
+	validate    *validator.Validate
+	pulseClient *pulse.Client
 }
 
 func NewContractHandler(service service.ContractService) *ContractHandler {
 	return &ContractHandler{
-		service:  service,
-		validate: validator.New(),
+		service:     service,
+		validate:    validator.New(),
+		pulseClient: pulse.New(),
 	}
 }
 
@@ -51,6 +54,13 @@ func (h *ContractHandler) CreateContract(c *fiber.Ctx) error {
 		}
 		return c.Status(status).JSON(fiber.Map{"error": err.Error()})
 	}
+
+	// BKL-096: Pulse tracking — contract_created
+	h.pulseClient.Track(c.Context(), "contract_created", userID.String(), map[string]string{
+		"product":      "contract-service",
+		"contract_id":  response.ContractID.String(),
+		"product_type": req.ProductType,
+	})
 
 	return c.Status(fiber.StatusCreated).JSON(response)
 }
@@ -104,6 +114,12 @@ func (h *ContractHandler) AcceptContract(c *fiber.Ctx) error {
 		}
 		return c.Status(status).JSON(fiber.Map{"error": errMsg})
 	}
+
+	// BKL-096: Pulse tracking — contract_accepted
+	h.pulseClient.Track(c.Context(), "contract_accepted", userID.String(), map[string]string{
+		"product":     "contract-service",
+		"contract_id": contractID.String(),
+	})
 
 	return c.JSON(response)
 }
