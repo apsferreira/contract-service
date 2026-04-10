@@ -44,7 +44,7 @@ func (s *contractService) CreateContract(ctx context.Context, req *model.CreateC
 		return nil, fmt.Errorf("failed to get active template: %w", err)
 	}
 	if template == nil {
-		return nil, fmt.Errorf("no active template found for product type: %s", req.ProductType)
+		return nil, fmt.Errorf("%w: %s", model.ErrTemplateNotFound, req.ProductType)
 	}
 
 	renderedHTML := s.renderTemplate(template.ContentHTML, req.Variables)
@@ -80,20 +80,20 @@ func (s *contractService) AcceptContract(ctx context.Context, contractID uuid.UU
 		return nil, fmt.Errorf("failed to get contract: %w", err)
 	}
 	if contract == nil {
-		return nil, fmt.Errorf("contract not found")
+		return nil, model.ErrContractNotFound
 	}
 
 	if contract.UserID != userID {
-		return nil, fmt.Errorf("unauthorized: contract belongs to different user")
+		return nil, model.ErrContractUnauthorized
 	}
 
 	if contract.Status == model.ContractStatusAccepted {
-		return nil, fmt.Errorf("contract already accepted")
+		return nil, model.ErrContractAlreadyAccepted
 	}
 
 	if time.Now().After(contract.ExpiresAt) {
 		_ = s.contractRepo.UpdateStatus(ctx, contractID, model.ContractStatusExpired)
-		return nil, fmt.Errorf("contract expired")
+		return nil, model.ErrContractExpired
 	}
 
 	// BKL-958: Iniciar transação — as 3 operações de escrita (CreateSignature,
@@ -181,7 +181,7 @@ func (s *contractService) GetContract(ctx context.Context, id uuid.UUID) (*model
 		return nil, fmt.Errorf("failed to get contract: %w", err)
 	}
 	if contract == nil {
-		return nil, fmt.Errorf("contract not found")
+		return nil, model.ErrContractNotFound
 	}
 	return contract, nil
 }

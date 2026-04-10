@@ -3,6 +3,7 @@ package handler
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -49,7 +50,7 @@ func (h *ContractHandler) CreateContract(c *fiber.Ctx) error {
 	response, err := h.service.CreateContract(c.Context(), &req)
 	if err != nil {
 		status := fiber.StatusInternalServerError
-		if err.Error() == "no active template found for product type: "+req.ProductType {
+		if errors.Is(err, model.ErrTemplateNotFound) {
 			status = fiber.StatusNotFound
 		}
 		return c.Status(status).JSON(fiber.Map{"error": err.Error()})
@@ -100,19 +101,19 @@ func (h *ContractHandler) AcceptContract(c *fiber.Ctx) error {
 
 	response, err := h.service.AcceptContract(c.Context(), contractID, userID, &req)
 	if err != nil {
+		// BKL-959: mapeamento HTTP via errors.Is (erros tipados)
 		status := fiber.StatusInternalServerError
-		errMsg := err.Error()
-		switch errMsg {
-		case "contract not found":
+		switch {
+		case errors.Is(err, model.ErrContractNotFound):
 			status = fiber.StatusNotFound
-		case "unauthorized: contract belongs to different user":
+		case errors.Is(err, model.ErrContractUnauthorized):
 			status = fiber.StatusForbidden
-		case "contract already accepted":
+		case errors.Is(err, model.ErrContractAlreadyAccepted):
 			status = fiber.StatusConflict
-		case "contract expired":
+		case errors.Is(err, model.ErrContractExpired):
 			status = fiber.StatusGone
 		}
-		return c.Status(status).JSON(fiber.Map{"error": errMsg})
+		return c.Status(status).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	// BKL-096: Pulse tracking — contract_accepted
@@ -136,7 +137,7 @@ func (h *ContractHandler) GetContract(c *fiber.Ctx) error {
 	contract, err := h.service.GetContract(c.Context(), contractID)
 	if err != nil {
 		status := fiber.StatusInternalServerError
-		if err.Error() == "contract not found" {
+		if errors.Is(err, model.ErrContractNotFound) {
 			status = fiber.StatusNotFound
 		}
 		return c.Status(status).JSON(fiber.Map{"error": err.Error()})
