@@ -3,10 +3,11 @@ package model
 import "errors"
 
 // BKL-959: erros de domínio tipados permitem mapeamento HTTP sem string comparison.
+// BKL-960: mensagens em português para consistência com padrão IIT.
 var (
-	ErrContractNotFound    = errors.New("contract not found")
-	ErrContractUnauthorized = errors.New("unauthorized: contract belongs to different user")
-	ErrContractAlreadyAccepted = errors.New("contract already accepted")
-	ErrContractExpired     = errors.New("contract expired")
-	ErrTemplateNotFound    = errors.New("no active template found")
+	ErrContractNotFound        = errors.New("contrato não encontrado")
+	ErrContractUnauthorized    = errors.New("não autorizado: contrato pertence a outro usuário")
+	ErrContractAlreadyAccepted = errors.New("contrato já foi aceito")
+	ErrContractExpired         = errors.New("contrato expirado")
+	ErrTemplateNotFound        = errors.New("template ativo não encontrado")
 )
