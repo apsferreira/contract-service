@@ -96,7 +96,21 @@ func (s *contractService) AcceptContract(ctx context.Context, contractID uuid.UU
 		return nil, fmt.Errorf("contract expired")
 	}
 
-	lastSignature, err := s.signatureRepo.GetLastSignature(ctx)
+	// BKL-958: Iniciar transação — as 3 operações de escrita (CreateSignature,
+	// UpdateContent, UpdateStatus) devem ser atômicas. Se qualquer uma falhar, o
+	// estado do contrato permanece consistente (nenhuma assinatura parcial em produção).
+	tx, err := s.contractRepo.BeginTx(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			_ = tx.Rollback(ctx)
+		}
+	}()
+
+	// Buscar último hash da cadeia dentro da transação para evitar race condition.
+	lastSignature, err := s.signatureRepo.GetLastSignatureTx(ctx, tx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get last signature: %w", err)
 	}
@@ -119,7 +133,7 @@ func (s *contractService) AcceptContract(ctx context.Context, contractID uuid.UU
 
 	signature.RecordHash = s.calculateRecordHash(signature)
 
-	if err := s.signatureRepo.Create(ctx, signature); err != nil {
+	if err = s.signatureRepo.CreateTx(ctx, tx, signature); err != nil {
 		return nil, fmt.Errorf("failed to create signature: %w", err)
 	}
 
@@ -142,12 +156,16 @@ func (s *contractService) AcceptContract(ctx context.Context, contractID uuid.UU
 	finalHTML := s.renderTemplate(contract.ContentHTML, signatureVars)
 	finalHash := s.calculateSHA256(finalHTML)
 
-	if err := s.contractRepo.UpdateContent(ctx, contractID, finalHTML, finalHash); err != nil {
+	if err = s.contractRepo.UpdateContentTx(ctx, tx, contractID, finalHTML, finalHash); err != nil {
 		return nil, fmt.Errorf("failed to update contract content: %w", err)
 	}
 
-	if err := s.contractRepo.UpdateStatus(ctx, contractID, model.ContractStatusAccepted); err != nil {
+	if err = s.contractRepo.UpdateStatusTx(ctx, tx, contractID, model.ContractStatusAccepted); err != nil {
 		return nil, fmt.Errorf("failed to update contract status: %w", err)
+	}
+
+	if err = tx.Commit(ctx); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
 	return &model.AcceptContractResponse{

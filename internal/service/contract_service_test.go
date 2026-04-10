@@ -7,7 +7,36 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/institutoitinerante/contract-service/internal/model"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
+
+// mockTx implementa pgx.Tx para testes de unidade sem banco real.
+// Os métodos de escrita (Exec/QueryRow) fazem no-op — os mocks de repositório
+// delegam as operações Tx de volta para o estado in-memory sem usar o tx.
+type mockTx struct{}
+
+func (t *mockTx) Begin(ctx context.Context) (pgx.Tx, error) { return t, nil }
+func (t *mockTx) Commit(ctx context.Context) error           { return nil }
+func (t *mockTx) Rollback(ctx context.Context) error         { return nil }
+func (t *mockTx) Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error) {
+	return pgconn.CommandTag{}, nil
+}
+func (t *mockTx) Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error) {
+	return nil, nil
+}
+func (t *mockTx) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row {
+	return nil
+}
+func (t *mockTx) CopyFrom(ctx context.Context, tableName pgx.Identifier, columnNames []string, rowSrc pgx.CopyFromSource) (int64, error) {
+	return 0, nil
+}
+func (t *mockTx) SendBatch(ctx context.Context, b *pgx.Batch) pgx.BatchResults { return nil }
+func (t *mockTx) LargeObjects() pgx.LargeObjects                               { return pgx.LargeObjects{} }
+func (t *mockTx) Prepare(ctx context.Context, name, sql string) (*pgconn.StatementDescription, error) {
+	return nil, nil
+}
+func (t *mockTx) Conn() *pgx.Conn { return nil }
 
 type mockContractRepo struct {
 	contracts map[uuid.UUID]*model.Contract
@@ -31,12 +60,20 @@ func (m *mockContractRepo) UpdateStatus(ctx context.Context, id uuid.UUID, statu
 	return nil
 }
 
+func (m *mockContractRepo) UpdateStatusTx(ctx context.Context, tx pgx.Tx, id uuid.UUID, status model.ContractStatus) error {
+	return m.UpdateStatus(ctx, id, status)
+}
+
 func (m *mockContractRepo) UpdateContent(ctx context.Context, id uuid.UUID, contentHTML, contentHash string) error {
 	if c, ok := m.contracts[id]; ok {
 		c.ContentHTML = contentHTML
 		c.ContentHash = contentHash
 	}
 	return nil
+}
+
+func (m *mockContractRepo) UpdateContentTx(ctx context.Context, tx pgx.Tx, id uuid.UUID, contentHTML, contentHash string) error {
+	return m.UpdateContent(ctx, id, contentHTML, contentHash)
 }
 
 func (m *mockContractRepo) UpdatePDFPath(ctx context.Context, id uuid.UUID, pdfPath string) error {
@@ -54,6 +91,10 @@ func (m *mockContractRepo) ListByUser(ctx context.Context, userID uuid.UUID, lim
 		}
 	}
 	return result, len(result), nil
+}
+
+func (m *mockContractRepo) BeginTx(ctx context.Context) (pgx.Tx, error) {
+	return &mockTx{}, nil
 }
 
 type mockTemplateRepo struct {
@@ -96,6 +137,10 @@ func (m *mockSignatureRepo) Create(ctx context.Context, signature *model.Contrac
 	return nil
 }
 
+func (m *mockSignatureRepo) CreateTx(ctx context.Context, tx pgx.Tx, signature *model.ContractSignature) error {
+	return m.Create(ctx, signature)
+}
+
 func (m *mockSignatureRepo) GetByContractID(ctx context.Context, contractID uuid.UUID) (*model.ContractSignature, error) {
 	for _, s := range m.signatures {
 		if s.ContractID == contractID {
@@ -106,6 +151,10 @@ func (m *mockSignatureRepo) GetByContractID(ctx context.Context, contractID uuid
 }
 
 func (m *mockSignatureRepo) GetLastSignature(ctx context.Context) (*model.ContractSignature, error) {
+	return m.lastSig, nil
+}
+
+func (m *mockSignatureRepo) GetLastSignatureTx(ctx context.Context, tx pgx.Tx) (*model.ContractSignature, error) {
 	return m.lastSig, nil
 }
 
