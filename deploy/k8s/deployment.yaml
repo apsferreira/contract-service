@@ -25,6 +25,7 @@ spec:
       containers:
       - name: contract-service
         image: ghcr.io/apsferreira/contract-service:main-d756b51
+        imagePullPolicy: Always
         ports:
         - containerPort: 3014
           name: http
