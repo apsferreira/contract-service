@@ -13,7 +13,7 @@ env:
 jobs:
   test:
     name: Run Tests
-    runs-on: ubuntu-latest
+    runs-on: iit-contract
 
     services:
       postgres:
@@ -65,7 +65,7 @@ jobs:
 
   build-backend:
     name: Build and Push Backend Image
-    runs-on: ubuntu-latest
+    runs-on: iit-contract
     needs: test
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     permissions:
@@ -110,7 +110,7 @@ jobs:
 
   build-frontend:
     name: Build and Push Frontend Image
-    runs-on: ubuntu-latest
+    runs-on: iit-contract
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     permissions:
       contents: read
@@ -154,7 +154,7 @@ jobs:
 
   update-manifest:
     name: Update K8s Manifests
-    runs-on: ubuntu-latest
+    runs-on: iit-contract
     needs: [build-backend]
     if: github.ref == 'refs/heads/main'
     permissions:
@@ -182,7 +182,7 @@ jobs:
 
   lint:
     name: Lint Code
-    runs-on: ubuntu-latest
+    runs-on: iit-contract
 
     steps:
     - name: Checkout code
