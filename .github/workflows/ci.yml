@@ -97,6 +97,14 @@ jobs:
           type=raw,value=latest,enable={{is_default_branch}}
           type=raw,value={{branch}}-latest
 
+    - name: Pre-pull base images
+      run: |
+        for img in golang:1.24-alpine alpine:3.21; do
+          for i in 1 2 3; do
+            docker pull "$img" && break || sleep 10
+          done
+        done
+
     - name: Build and push backend image
       uses: docker/build-push-action@v5
       with:
@@ -140,6 +148,14 @@ jobs:
           type=sha,prefix={{branch}}-
           type=raw,value=latest,enable={{is_default_branch}}
           type=raw,value={{branch}}-latest
+
+    - name: Pre-pull base images
+      run: |
+        for img in node:22-alpine nginx:alpine; do
+          for i in 1 2 3; do
+            docker pull "$img" && break || sleep 10
+          done
+        done
 
     - name: Build and push frontend image
       uses: docker/build-push-action@v5
