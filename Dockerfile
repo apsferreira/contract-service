@@ -6,7 +6,7 @@ WORKDIR /app
 ENV GOTOOLCHAIN=auto
 ENV GODEBUG=preferIPv4Lookups=1
 ENV GONOSUMDB=*
-ENV GOPROXY=https://goproxy.io,direct
+ENV GOPROXY=https://proxy.golang.org,direct
 ENV CGO_ENABLED=0
 
 
