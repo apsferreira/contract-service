@@ -5,6 +5,7 @@ WORKDIR /app
 
 ENV GOTOOLCHAIN=auto
 ENV GODEBUG=preferIPv4Lookups=1
+ENV CGO_ENABLED=0
 
 RUN apk add --no-cache git
 
