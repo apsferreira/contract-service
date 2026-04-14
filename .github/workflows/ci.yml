@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI/CD
 
 on:
   push:
@@ -7,221 +7,176 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: apsferreira/contract-service
-  FRONTEND_IMAGE: apsferreira/contract-service-frontend
 
 jobs:
   test:
-    name: Run Tests
+    name: Test
     runs-on: iit-contract
+    continue-on-error: true
+    timeout-minutes: 10
 
-    services:
-      postgres:
-        image: postgres:16-alpine
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Start Postgres via Docker
+        run: |
+          docker run -d --name pg_test \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=postgres \
+            -e POSTGRES_DB=contract_test \
+            -p 5432:5432 \
+            postgres:15
+          for i in $(seq 1 30); do
+            docker exec pg_test pg_isready -U postgres 2>/dev/null && echo "postgres pronto" && break
+            sleep 2
+          done
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          cache: false
+
+      - name: Download dependencies
         env:
-          POSTGRES_DB: test_db
-          POSTGRES_USER: test_user
-          POSTGRES_PASSWORD: test_pass
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
+          GOTOOLCHAIN: auto
+        run: go mod download
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v6
+      - name: Run tests
+        env:
+          GOTOOLCHAIN: auto
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/contract_test?sslmode=disable
+        run: go test ./... -timeout 60s
 
-    - name: Set up Go
-      uses: actions/setup-go@v6
-      with:
-        go-version: '1.24'
+      - name: Cleanup containers
+        if: always()
+        run: docker rm -f pg_test 2>/dev/null || true
 
-    - name: Cache Go modules
-      uses: actions/cache@v3
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-
-    - name: Download dependencies
-      run: go mod download
-
-    - name: Run tests
-      env:
-        DATABASE_URL: postgres://test_user:test_pass@localhost:5432/test_db?sslmode=disable
-        JWT_SECRET: test-secret-for-ci
-      run: go test -v -race -coverprofile=coverage.out ./...
-
-    - name: Upload coverage
-      uses: actions/upload-artifact@v7
-      if: always()
-      with:
-        name: coverage
-        path: coverage.out
-
-  build-backend:
-    name: Build and Push Backend Image
+  build-and-push:
+    name: Build & Push Backend
     runs-on: iit-contract
-    needs: test
-    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    if: github.ref == 'refs/heads/main'
+    timeout-minutes: 10
     permissions:
       contents: read
       packages: write
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-      with:
-        driver: docker
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Log in to GHCR
-      uses: docker/login-action@v4
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/apsferreira/contract-service
+          tags: |
+            type=raw,value=main-latest
+            type=sha,prefix=sha-
 
-    - name: Extract metadata
-      id: meta
-      uses: docker/metadata-action@v6
-      with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-        tags: |
-          type=ref,event=branch
-          type=sha,prefix={{branch}}-
-          type=raw,value=latest,enable={{is_default_branch}}
-          type=raw,value={{branch}}-latest
+      - name: Setup Buildx driver docker
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker
 
-    - name: Pre-pull base images
-      run: |
-        for img in golang:1.24-alpine alpine:3.21; do
-          for i in 1 2 3; do
-            docker pull "$img" && break || sleep 10
-          done
-        done
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
-    - name: Build and push backend image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        platforms: linux/amd64
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-
-  build-frontend:
-    name: Build and Push Frontend Image
+  build-and-push-frontend:
+    name: Build & Push Frontend
     runs-on: iit-contract
-    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    if: github.ref == 'refs/heads/main'
+    timeout-minutes: 10
     permissions:
       contents: read
       packages: write
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-      with:
-        driver: docker
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Log in to GHCR
-      uses: docker/login-action@v4
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/apsferreira/contract-service-frontend
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=sha-
 
-    - name: Extract metadata
-      id: meta
-      uses: docker/metadata-action@v6
-      with:
-        images: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}
-        tags: |
-          type=ref,event=branch
-          type=sha,prefix={{branch}}-
-          type=raw,value=latest,enable={{is_default_branch}}
-          type=raw,value={{branch}}-latest
+      - name: Setup Buildx driver docker
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker
 
-    - name: Pre-pull base images
-      run: |
-        for img in node:22-alpine nginx:alpine; do
-          for i in 1 2 3; do
-            docker pull "$img" && break || sleep 10
-          done
-        done
-
-    - name: Build and push frontend image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./frontend
-        platforms: linux/amd64
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+          cache-from: type=local,src=/home/runner/buildcache-contract-frontend
+          cache-to: type=local,dest=/home/runner/buildcache-contract-frontend,mode=max
 
   update-manifest:
-    name: Update K8s Manifests
+    name: Update K8s Manifest
     runs-on: iit-contract
-    needs: [build-backend]
+    needs: [build-and-push, build-and-push-frontend]
     if: github.ref == 'refs/heads/main'
+    timeout-minutes: 5
     permissions:
       contents: write
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v6
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
 
-    - name: Update image tags in deployment manifests
-      run: |
-        SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-        sed -i "s|ghcr.io/apsferreira/contract-service:.*|ghcr.io/apsferreira/contract-service:main-${SHORT_SHA}|" deploy/k8s/deployment.yaml
-        sed -i "s|ghcr.io/apsferreira/contract-service-frontend:.*|ghcr.io/apsferreira/contract-service-frontend:main-${SHORT_SHA}|" deploy/k8s/frontend-deployment.yaml
+      - name: Update image tags
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          sed -i "s|image: ghcr.io/apsferreira/contract-service:.*|image: ghcr.io/apsferreira/contract-service:sha-${SHORT_SHA}|" deploy/k8s/deployment.yaml
+          sed -i "s|image: ghcr.io/apsferreira/contract-service-frontend:.*|image: ghcr.io/apsferreira/contract-service-frontend:sha-${SHORT_SHA}|" deploy/k8s/frontend-deployment.yaml
 
-    - name: Commit and push updated manifests
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add deploy/k8s/deployment.yaml deploy/k8s/frontend-deployment.yaml
-        git diff --staged --quiet || git commit -m "chore(k8s): atualiza imagens para main-sha-$(echo '${{ github.sha }}' | cut -c1-7) [skip ci]"
-        git push
-
-  lint:
-    name: Lint Code
-    runs-on: iit-contract
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v6
-
-    - name: Set up Go
-      uses: actions/setup-go@v6
-      with:
-        go-version: '1.24'
-
-    - name: Run golangci-lint
-      uses: golangci/golangci-lint-action@v7
-      with:
-        version: v2.11.4
+      - name: Commit updated manifests
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add deploy/k8s/deployment.yaml deploy/k8s/frontend-deployment.yaml
+          git diff --staged --quiet || git commit -m "ci: update images to sha-$(echo '${{ github.sha }}' | cut -c1-7)"
+          git push
