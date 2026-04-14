@@ -10,11 +10,13 @@ ENV CGO_ENABLED=0
 RUN apk add --no-cache git
 
 COPY go.mod go.sum ./
-RUN go mod download
+RUN --mount=type=cache,target=/root/go/pkg/mod go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o contract-service ./cmd/server
+RUN --mount=type=cache,target=/root/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o contract-service ./cmd/server
 
 # Final stage
 FROM alpine:3.21

@@ -104,6 +104,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=local,src=/home/runner/buildcache-contract-backend
+          cache-to: type=local,dest=/home/runner/buildcache-contract-backend,mode=max
 
   build-and-push-frontend:
     name: Build & Push Frontend
