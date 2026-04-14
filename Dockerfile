@@ -4,6 +4,7 @@ FROM golang:1.24-alpine AS builder
 WORKDIR /app
 
 ENV GOTOOLCHAIN=auto
+ENV GODEBUG=preferIPv4Lookups=1
 
 RUN apk add --no-cache git
 
