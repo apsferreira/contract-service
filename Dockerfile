@@ -3,7 +3,7 @@ FROM golang:1.24 AS builder
 
 WORKDIR /app
 
-ENV GOTOOLCHAIN=auto
+ENV GOTOOLCHAIN=local
 ENV GODEBUG=preferIPv4Lookups=1
 ENV GONOSUMDB=*
 ENV GOPROXY=https://proxy.golang.org,direct
@@ -19,8 +19,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o contract-service 
 
 # Final stage
 FROM alpine:3.21
-
-RUN apk --no-cache add ca-certificates tzdata
 
 WORKDIR /app
 
