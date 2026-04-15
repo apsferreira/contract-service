@@ -11,7 +11,7 @@ env:
 jobs:
   test:
     name: Test
-    runs-on: iit-contract
+    runs-on: iit-openclaw
     continue-on-error: true
     timeout-minutes: 10
 
@@ -60,7 +60,7 @@ jobs:
 
   build-and-push:
     name: Build & Push Backend
-    runs-on: iit-contract
+    runs-on: iit-openclaw
     if: github.ref == 'refs/heads/main'
     timeout-minutes: 60
     permissions:
@@ -106,7 +106,7 @@ jobs:
 
   build-and-push-frontend:
     name: Build & Push Frontend
-    runs-on: iit-contract
+    runs-on: iit-openclaw
     if: github.ref == 'refs/heads/main'
     timeout-minutes: 10
     permissions:
@@ -152,7 +152,7 @@ jobs:
 
   update-manifest:
     name: Update K8s Manifest
-    runs-on: iit-contract
+    runs-on: iit-openclaw
     needs: [build-and-push, build-and-push-frontend]
     if: github.ref == 'refs/heads/main'
     timeout-minutes: 5
